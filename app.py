@@ -55,13 +55,9 @@ def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id
         new_dashcard['card_id'] = duplicated_dashcard['id']
       
         new_dashcard['dashboard_tab_id'] = new_tab_id
-        modified_dashcard = modification_function(new_dashcard)
+        modified_dashcard, data_to_update = modification_function(new_dashcard)
 
-        updated_data = {
-          'name': modified_dashcard["card"]["name"].replace('Viande/Volaille 🥩', 'Poisson 🐟'),
-          'dataset_query': json.loads(json.dumps(modified_dashcard["card"]["dataset_query"]).replace('meat_poultry', 'fish'))
-        }
-        response = requests.put(f"{base_url}/api/card/{modified_dashcard['card_id']}", headers=headers, json=updated_data)
+        response = requests.put(f"{base_url}/api/card/{modified_dashcard['card_id']}", headers=headers, json=data_to_update)
         duplicated_dashcard = response.json()
 
         new_dashcards.append(modified_dashcard)
@@ -88,13 +84,24 @@ def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id
     print("Error")
 
 # Example usage
-def modify_question_name(question):
+def modify_question_name(question: dict):
+  """
+  Need to modify the question for :
+  * the full dashboard dict
+  * each question 
+  This is why we return two objects
+  """
   if 'name' in question['card'].keys():
     try:
       question["card"]["name"] = question["card"]["name"].replace('Viande/Volaille 🥩', 'Poisson 🐟')
+      question["card"]["dataset_query"] = json.loads(json.dumps(question["card"]["dataset_query"]).replace('meat_poultry', 'fish'))
+      data_to_update = {
+          'name': question["card"]["name"].replace('Viande/Volaille 🥩', 'Poisson 🐟'),
+          'dataset_query': json.loads(json.dumps(question["card"]["dataset_query"]).replace('meat_poultry', 'fish'))
+        }
     except Exception as e:
       print(e)
-    return question
+    return question, data_to_update
 
 
 api_key = os.getenv('API_KEY')
