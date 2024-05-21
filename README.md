@@ -30,11 +30,15 @@ G --> H[End - Success];
     Python 3
     requests library (install using pip install requests)
 
-    API_KEY: Replace YOUR_API_KEY in the script with your actual Metabase API key.
-    BASE_URL: Replace https://your-metabase-domain.com with the base URL of your Metabase instance.
-    DASBOARD_ID & TAB_NAME: Update the dashboard_id and tab_name variables with the ID of the dashboard containing the target tab and the name of the tab itself.
-    Modification Function: Define a function named modify_question that takes a question dictionary as input and returns the modified dictionary. Refer to the example provided in the script for guidance.
-    Run the Script: Execute the script using python metabase_question_duplicator.py (replace metabase_question_duplicator.py with your actual filename).
+* API_KEY: Replace YOUR_API_KEY in the script with your actual Metabase API key.
+* BASE_URL: Replace https://your-metabase-domain.com with the base URL of your Metabase instance.
+* DASBOARD_ID & TAB_NAME: Update the dashboard_id and tab_name variables with the ID of the dashboard containing the target tab and the name of the tab itself.   
+* Modification Function: Define a function named modify_question that takes a question dictionary as input and returns the modified dictionary. Refer to the example provided in the script for guidance.
+* Run the Script: Execute the script using python metabase_question_duplicator.py (replace metabase_question_duplicator.py with your actual filename).
+
+The scrit does not duplicate the text !
+
+    
 
 ## Example
 
