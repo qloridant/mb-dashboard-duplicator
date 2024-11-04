@@ -6,6 +6,18 @@ from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
 
+
+def get_headers(api_key):
+  return {"x-api-key": api_key}
+
+
+def get_dashboard_data(api_key, base_url, dashboard_id):
+    dashboard_url = f"{base_url}/api/dashboard/{dashboard_id}"
+    headers = get_headers(api_key)
+    response = requests.get(dashboard_url, headers=headers)
+    return response.json()
+
+
 def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id, tab_name, modification_function):
   """
   This function retrieves questions from a Metabase dashboard tab, duplicates them 
@@ -19,12 +31,9 @@ def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id
       modification_function (function): A function that takes a question dictionary 
                                          and returns a modified dictionary.
   """
-
   # Get dashboard details
-  dashboard_url = f"{base_url}/api/dashboard/{dashboard_id}"
-  headers = {"x-api-key": api_key}
-  response = requests.get(dashboard_url, headers=headers)
-  dashboard_data = response.json()
+  dashboard_data = get_dashboard_data(api_key, base_url, dashboard_id)
+
 
   # Save the tabs config
   tabs = dashboard_data["tabs"]
@@ -45,7 +54,7 @@ def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id
   for dashcard in dashboard_data['dashcards']:
     if dashcard['dashboard_tab_id'] == target_tab_id:
       # Duplicate each question
-      response = requests.post(f"{base_url}/api/card/{dashcard['card_id']}/copy", headers=headers)
+      response = requests.post(f"{base_url}/api/card/{dashcard['card_id']}/copy", headers=get_headers(api_key))
       duplicated_dashcard = response.json()
       
       # Modify the card config
@@ -57,7 +66,7 @@ def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id
         new_dashcard['dashboard_tab_id'] = new_tab_id
         modified_dashcard, data_to_update = modification_function(new_dashcard)
 
-        response = requests.put(f"{base_url}/api/card/{modified_dashcard['card_id']}", headers=headers, json=data_to_update)
+        response = requests.put(f"{base_url}/api/card/{modified_dashcard['card_id']}", headers=get_headers(api_key), json=data_to_update)
         duplicated_dashcard = response.json()
 
         new_dashcards.append(modified_dashcard)
@@ -76,7 +85,7 @@ def duplicate_and_modify_dashboard_tab_questions(api_key, base_url, dashboard_id
       'name': new_tab_name
     }
   )
-  response = requests.put(create_tab_url, headers=headers, json=dashboard_data)
+  response = requests.put(create_tab_url, headers=get_headers(api_key), json=dashboard_data)
 
   if response.status_code == 200:
     print(f"Successfully duplicated and modified questions from tab ")
